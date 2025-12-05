@@ -35,8 +35,13 @@ function ChatView({ room, user }) {
             fetchMessages();
 
             // 2. Establish WebSocket connection
-            // Note: Use 'ws' for http and 'wss' for https
-            const wsUrl = `ws://127.0.0.1:8000/ws/chat/${room.slug}/?token=${user.tokens.access}`;
+            // Determine WebSocket protocol and host based on the environment
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            // In production, the backend and frontend are on the same host.
+            // In development, we use a specific host and port from env variables.
+            const wsHost = import.meta.env.VITE_WS_HOST || window.location.host;
+
+            const wsUrl = `${wsProtocol}://${wsHost}/ws/chat/${room.slug}/?token=${user.tokens.access}`;
             const socket = new WebSocket(wsUrl);
             console.log('socket:', socket);
             socketRef.current = socket;
